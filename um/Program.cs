@@ -9,9 +9,29 @@ var users = new List<User>
     new User { UserId= Guid.NewGuid(), UserName = "Bob", UserAge = 25 }
 };
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+
+        var errorResponse = new
+        {
+            error = "Something went wrong.",
+            timestamp = DateTime.UtcNow
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+        await context.Response.WriteAsync(json);
+    });
+});
+
 // Create user
 app.MapPost("/users", (User newUser) =>
 {
+    if (string.IsNullOrWhiteSpace(newUser.UserName))
+        return Results.BadRequest("UserName is required.");
     newUser.UserId = Guid.NewGuid(); // Generate a new UserId
     users.Add(newUser);
     return Results.Created($"/users/{newUser.UserName}", newUser);
@@ -49,6 +69,7 @@ app.MapDelete("/users/{id:guid}", (Guid id) =>
     users.Remove(user);
     return Results.Ok(user);
 });
+
 
 app.Run();
 
