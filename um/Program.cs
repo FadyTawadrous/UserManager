@@ -1,5 +1,7 @@
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHttpLogging((o) => { });
+
 var app = builder.Build();
 
 // In-memory list of users
@@ -8,6 +10,8 @@ var users = new List<User>
     new User { UserId = Guid.NewGuid(), UserName = "Alice", UserAge = 30 },
     new User { UserId= Guid.NewGuid(), UserName = "Bob", UserAge = 25 }
 };
+
+app.UseHttpLogging();
 
 app.UseExceptionHandler(errorApp =>
 {
