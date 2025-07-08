@@ -1,0 +1,6 @@
+@um_HostAddress = http://localhost:5082
+
+GET {{um_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
